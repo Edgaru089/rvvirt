@@ -1,0 +1,37 @@
+
+.SILENT:
+
+
+FLAGS_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
+SELF_DIR   = $(dir $@)
+
+export RM = rm
+export CP = cp
+
+
+export AR1 := $(AR)
+export AS1 := $(AS)
+export CC1 := $(CC)
+export CXX1 := $(CXX)
+export LD1 := $(LD)
+export FASM1 := fasm
+
+
+export AR   = echo "  AR    $<" && $(AR1)
+export AS   = echo "  AS    $^" && $(AS1)
+export CC   = echo "  CC    $^" && $(CC1)
+export CXX  = echo "  CXX   $^" && $(CXX1)
+export LD   = echo "  LD    $@" && $(LD1)
+export FASM = echo "  FASM  $^" && $(FASM1) > /dev/null
+
+export INCLUDEFLAGS = -iquote $(FLAGS_DIR)/include
+
+export CPPFLAGS =
+export CFLAGS   = $(INCLUDEFLAGS) $(BUILD_OPTIONS) -O2 -Wno-attributes -fPIE
+export CXXFLAGS = $(INCLUDEFLAGS) $(BUILD_OPTIONS) -O2 -Wno-unused-result -std=c++17 -fPIE
+export LDFLAGS  = -O2
+export LDLIBS   = -lc -lstdc++
+
+# Pattern rule for FASM assembly
+%.o: %.S
+	$(FASM) $^ $@
